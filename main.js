@@ -99,58 +99,38 @@ async function main() {
         const due = asgmt.due
         const now = new Date().getTime()
         const expredIn = due - now
-        const expredTxt = (expredIn < 3600000) ? String(Math.floor(expredIn / 60000)) + "分" :
-                          (expredIn < 86400000) ? String(Math.floor(expredIn / 3600000)) + "時間" :
-                          (expredIn < 2592000000) ? String(Math.floor(expredIn / 86400000)) + "日" :
-                          String(Math.floor(expredIn / 2592000000)) + "ヶ月";
-
-        const td1 = document.createElement("td");
-            td1.setAttribute("style", "width: 60px")
-            const div1 = document.createElement("div")
-                div1.setAttribute("class", "news-courseinfo")
-                div1.setAttribute("style", "width: 60px")
-                if (expredIn < 0.5 * 24 * 3600000) div1.setAttribute("style", "width: 60px; color: #6c2463");
-                else if (expredIn < 1.5 * 24 * 3600000) div1.setAttribute("style", "width: 60px; color: #6a1917");
-                else if (expredIn < 3 * 24 * 3600000) div1.setAttribute("style", "width: 60px; color: #665a1a");
-                else if (expredIn < 5 * 24 * 3600000) div1.setAttribute("style", "width: 60px; color: #00608d");
-                else div1.setAttribute("style", "width: 60px");
-                div1.textContent = expredTxt
-            td1.appendChild(div1)
-        const td2 = document.createElement("td");
-            td2.setAttribute("style", "width: auto;")
-            const div2 = document.createElement("div")
-                div2.setAttribute("class", "news-title newsentry")
-                div2.setAttribute("style", "width: auto;")
-                const img2 = document.createElement("img")
-                    img2.setAttribute("src", "/icon-coursedeadline-on.png")
-                    img2.setAttribute("class", "inline")
-                const a2 = document.createElement("a")
-                    a2.setAttribute("class", "inline")
-                    a2.setAttribute("style", "width: auto")
-                    a2.href = asgmt.title_link
-                    a2.textContent = asgmt.title
-                div2.appendChild(img2); 
-                div2.appendChild(a2)
-            td2.appendChild(div2)
-        const td3 = document.createElement("td")
-            td3.setAttribute("style", "width: 200px")
-            const div3 = document.createElement("div")
-                div3.setAttribute("class", "news-courseinfo")
-                div3.setAttribute("style", "width: 200px")
-                const a3 = document.createElement("a")
-                    a3.textContent = asgmt.cource
-                    a3.href = asgmt.cource_link
-                div3.appendChild(a3)
-            td3.appendChild(div3)
+        const expredTxt = (expredIn < 3600000) ? String(Math.round(expredIn / 60000)) + "分後" :
+                          (expredIn < 86400000) ? String(Math.round(expredIn / 3600000)) + "時間後" :
+                          (expredIn < 2592000000) ? String(Math.round(expredIn / 86400000)) + "日後" :
+                          String(Math.round(expredIn / 2592000000)) + "ヶ月後";
+        var bgcolor, dateColor;
+        if      (expredIn < 0.5 * 24 * 3600000) {bgcolor = "ee99ff"; dateColor = "47266e";}
+        else if (expredIn < 1.5 * 24 * 3600000) {bgcolor = "f19ca7"; dateColor = "6c272d";}
+        else if (expredIn < 3   * 24 * 3600000) {bgcolor = "ffe9a9"; dateColor = "866629";}
+        else if (expredIn < 5   * 24 * 3600000) {bgcolor = "a3e6e6"; dateColor = "006948";}
         const tr = document.createElement("tr")
-            if (expredIn < 0.5 * 24 * 3600000) tr.setAttribute("style", "background-color: #e0c1ff");
-            else if (expredIn < 1.5 * 24 * 3600000) tr.setAttribute("style", "background-color: #ffc1c1");
-            else if (expredIn < 3 * 24 * 3600000) tr.setAttribute("style", "background-color: #ffffc1");
-            else if (expredIn < 5 * 24 * 3600000) tr.setAttribute("style", "background-color: #c1ffff");
+        tr.setAttribute("style", "background-color: #" + bgcolor);
+        tr.innerHTML = `
+            <td style="width: 60px">
+                <div class="news-courseinfo" style="width: 60px; color: #${dateColor}; ${(expredIn < 5 * 24 * 3600000) ? 'font-weight: bold;' : ''}">
+                    ${expredTxt}
+                </div>
+            </td>
+            <td style="width: auto">
+                <div class="news-title newsentry" style="width: auto">
+                    <img src="/icon-coursedeadline-on.png" class="inline" /><a class="inline" style="width: auto" href="${asgmt.title_link}">${asgmt.title}</a>
+                </div>
+            </td>
+            <td style="width: 200px">
+                <div class="news-courseinfo" style="width: 200px">
+                    <a href="${asgmt.cource_link}">${asgmt.cource}</a>
+                </div>
+            </td>
+        `
             
-            tr.appendChild(td1)
-            tr.appendChild(td2)
-            tr.appendChild(td3)
+            // tr.appendChild(td1)
+            // tr.appendChild(td2)
+            // tr.appendChild(td3)
 
         tbody.appendChild(tr)
     })
