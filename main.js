@@ -1,5 +1,69 @@
+const _1MIN = 60 * 1000;
+const _1HUR = 60 * _1MIN;
+const _1DAY = 24 * _1HUR;
+const _1MON = 30 * _1DAY;
+
+const EXPIRE_CRISIS = 0.5 * _1DAY;
+const EXPIRE_DANGER = 1.5 * _1DAY;
+const EXPIRE_WARN   = 3.5 * _1DAY;
+const EXPIRE_INFO   = 7.5 * _1DAY;
+
+function getManabaTableHTML(title) {
+    return `
+    <div class="my-infolist my-infolist-coursenews">
+        <div class="my-infolist-header">
+            <h2>${title}</h2>
+        </div>
+        <ul class="infolist-tab">
+            <li class="current"><a href="" onclick="">すべて</a> </li> 
+        </ul>
+        <div class="align">
+            <span></span>
+        </div>
+        <div class="my-infolist-body"><div class="groupthreadlist"><table><tbody>
+        </tbody></table></div></div>
+        <div class="showmore" hidden>
+            <img src="/icon_mypage_showmore.png" alt="" class="inline" title="">
+            <a href="home_coursenews_?nocategoryonly=&amp;categoryid=">あああ</a>
+        </div>
+    </div>
+    `
+}
+
 /**
- * @param {str} url 
+ * @param {String} dateColor 
+ * @param {Boolean} isBold 
+ * @param {String} expredTxt 
+ * @param {String} title 
+ * @param {String} title_link 
+ * @param {String} course 
+ * @param {String} cource_link 
+ * @returns 
+ */
+function getManabaTableRowHTML(dateColor, isBold, expredTxt, title, title_link, course, cource_link) {
+    return `
+        <td style="width: 60px">
+            <div class="news-courseinfo" style="width: 60px; color: #${dateColor}; ${(isBold) ? 'font-weight: bold;' : ''}">
+                ${expredTxt}
+            </div>
+        </td>
+        <td style="width: auto">
+            <div class="news-title newsentry" style="width: auto">
+                <img src="/icon-coursedeadline-on.png" class="inline" /><a class="inline" style="width: auto" href="${title_link}">${title}</a>
+            </div>
+        </td>
+        <td style="width: 200px">
+            <div class="news-courseinfo" style="width: 200px">
+                <a href="${cource_link}">${course}</a>
+            </div>
+        </td>
+    `
+}
+
+/** @typedef {{title: String, cource: String, title_link: String, cource_link: String, due: int}} assignment_detail */
+
+/** 
+ * @param {str} url
  * @returns {Promise.<Document>}
  */
 function getHTMLDoc(url) {
@@ -10,7 +74,6 @@ function getHTMLDoc(url) {
     );
 }
 
-/** @typedef {{title: String, cource: String, title_link: String, cource_link: String, due: int}} assignment_detail */
 /** @param {Document} manaba_document */
 function parseManabaAsgmtDetails(manaba_document) {
     const table = manaba_document.getElementsByClassName("stdlist")[0];
@@ -43,39 +106,14 @@ async function getManabaAsgments() {
         resolve();
     })));
     return asgmts
-
-    // Object.values(asgmts).forEach(asgmt => {
-    //     asgmt.forEach(detail => {
-    //         console.log(detail.title + " | " + detail.cource + " | " + detail.due);
-    //     })
-    // })
 }
 
-function genManabaTable(title, tabs) {
+function genManabaTable(title) {
     const body = document.getElementsByClassName('contentbody-left')[0]
     const ref_elem = body.children[0];
     var div = document.createElement('div');
     body.insertBefore(div, ref_elem);
-    div.innerHTML = 
-        `
-        <div class="my-infolist my-infolist-coursenews">
-            <div class="my-infolist-header">
-                <h2>${title}</h2>
-            </div>
-            <ul class="infolist-tab">
-                <li class="current"><a href="" onclick="">すべて</a> </li> 
-            </ul>
-            <div class="align">
-                <span></span>
-            </div>
-            <div class="my-infolist-body"><div class="groupthreadlist"><table><tbody>
-            </tbody></table></div></div>
-            <div class="showmore" hidden>
-                <img src="/icon_mypage_showmore.png" alt="" class="inline" title="">
-                <a href="home_coursenews_?nocategoryonly=&amp;categoryid=">あああ</a>
-            </div>
-        </div>
-        `
+    div.innerHTML = getManabaTableHTML(title)
 
     return div.children[0].children[3].children[0].children[0].children[0]
 }
@@ -87,46 +125,27 @@ async function main() {
     var marged_asgmts = asgmts.query;
     marged_asgmts = marged_asgmts.concat(asgmts.report, asgmts.survey);
 
-    //①要素を変数保持
-    let result = Object.keys(marged_asgmts).map(function(key) {
-        return marged_asgmts[key];
-    //②dateでソート
-    }).sort(function(a, b) {
-        return (a.due < b.due) ? -1 : 1;  //オブジェクトの昇順ソート
-    });
+    let result = Object.keys(marged_asgmts)
+        .map(key => marged_asgmts[key])
+        .sort((a, b) => (a.due < b.due) ? -1 : 1);
 
     Object.values(result).forEach(asgmt => {
         const due = asgmt.due
         const now = new Date().getTime()
         const expredIn = due - now
-        const expredTxt = (expredIn < 3600000) ? String(Math.round(expredIn / 60000)) + "分後" :
-                          (expredIn < 86400000) ? String(Math.round(expredIn / 3600000)) + "時間後" :
-                          (expredIn < 2592000000) ? String(Math.round(expredIn / 86400000)) + "日後" :
-                          String(Math.round(expredIn / 2592000000)) + "ヶ月後";
+        const expredTxt = (expredIn < _1HUR) ? String(Math.floor(expredIn / _1MIN)) + "分後" :
+                          (expredIn < _1DAY) ? String(Math.floor(expredIn / _1HUR)) + "時間後" :
+                          (expredIn < _1MON) ? String(Math.floor(expredIn / _1DAY)) + "日後" :
+                                               String(Math.floor(expredIn / _1MON)) + "ヶ月後";
         var bgcolor, dateColor;
-        if      (expredIn < 0.5 * 24 * 3600000) {bgcolor = "ee99ff"; dateColor = "47266e";}
-        else if (expredIn < 1.5 * 24 * 3600000) {bgcolor = "f19ca7"; dateColor = "6c272d";}
-        else if (expredIn < 3   * 24 * 3600000) {bgcolor = "ffe9a9"; dateColor = "866629";}
-        else if (expredIn < 5   * 24 * 3600000) {bgcolor = "a3e6e6"; dateColor = "006948";}
+        if      (expredIn < EXPIRE_CRISIS) {bgcolor = "ee99ff"; dateColor = "47266e";}
+        else if (expredIn < EXPIRE_DANGER) {bgcolor = "f19ca7"; dateColor = "6c272d";}
+        else if (expredIn < EXPIRE_WARN  ) {bgcolor = "ffe9a9"; dateColor = "866629";}
+        else if (expredIn < EXPIRE_INFO  ) {bgcolor = "a3e6e6"; dateColor = "006948";}
         const tr = document.createElement("tr")
         tr.setAttribute("style", "background-color: #" + bgcolor);
-        tr.innerHTML = `
-            <td style="width: 60px">
-                <div class="news-courseinfo" style="width: 60px; color: #${dateColor}; ${(expredIn < 5 * 24 * 3600000) ? 'font-weight: bold;' : ''}">
-                    ${expredTxt}
-                </div>
-            </td>
-            <td style="width: auto">
-                <div class="news-title newsentry" style="width: auto">
-                    <img src="/icon-coursedeadline-on.png" class="inline" /><a class="inline" style="width: auto" href="${asgmt.title_link}">${asgmt.title}</a>
-                </div>
-            </td>
-            <td style="width: 200px">
-                <div class="news-courseinfo" style="width: 200px">
-                    <a href="${asgmt.cource_link}">${asgmt.cource}</a>
-                </div>
-            </td>
-        `
+        tr.innerHTML = getManabaTableRowHTML(dateColor, (expredIn < 5 * 24 * 3600000), expredTxt,
+                                             asgmt.title, asgmt.title_link, asgmt.cource, asgmt.cource_link)
 
         tbody.appendChild(tr)
     })
