@@ -3,8 +3,9 @@ const _1HUR = 60 * _1MIN;
 const _1DAY = 24 * _1HUR;
 const _1MON = 30 * _1DAY;
 
-const EXPIRE_CRISIS = 0.5 * _1DAY;
-const EXPIRE_DANGER = 1.5 * _1DAY;
+const EXPIRE_CRISIS =  3 * _1HUR;
+const EXPIRE_DANGER = 12 * _1HUR;
+const EXPIRE_RISKY  = 1.5 * _1DAY
 const EXPIRE_WARN   = 3.5 * _1DAY;
 const EXPIRE_INFO   = 7.5 * _1DAY;
 
@@ -40,7 +41,7 @@ function getManabaTableHTML(title) {
  * @param {String} cource_link 
  * @returns 
  */
-function getManabaTableRowHTML(dateColor, isBold, expredTxt, title, title_link, course, cource_link) {
+function getManabaTableRowHTML(dateColor, textColor, isBold, expredTxt, title, title_link, course, cource_link) {
     return `
         <td style="width: 60px">
             <div class="news-courseinfo" style="width: 60px; color: #${dateColor}; ${(isBold) ? 'font-weight: bold;' : ''}">
@@ -49,12 +50,13 @@ function getManabaTableRowHTML(dateColor, isBold, expredTxt, title, title_link, 
         </td>
         <td style="width: auto">
             <div class="news-title newsentry" style="width: auto">
-                <img src="/icon-coursedeadline-on.png" class="inline" /><a class="inline" style="width: auto" href="${title_link}">${title}</a>
+                <img src="/icon-coursedeadline-on.png" class="inline" />
+                <a class="inline" style="width: auto;${(textColor == undefined)? '' : (' color: #' + textColor)}" href="${title_link}">${title}</a>
             </div>
         </td>
         <td style="width: 200px">
             <div class="news-courseinfo" style="width: 200px">
-                <a href="${cource_link}">${course}</a>
+                <a href="${cource_link}"${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>${course}</a>
             </div>
         </td>
     `
@@ -137,14 +139,15 @@ async function main() {
                           (expredIn < _1DAY) ? String(Math.floor(expredIn / _1HUR)) + "時間後" :
                           (expredIn < _1MON) ? String(Math.floor(expredIn / _1DAY)) + "日後" :
                                                String(Math.floor(expredIn / _1MON)) + "ヶ月後";
-        var bgcolor, dateColor;
-        if      (expredIn < EXPIRE_CRISIS) {bgcolor = "ee99ff"; dateColor = "47266e";}
-        else if (expredIn < EXPIRE_DANGER) {bgcolor = "f19ca7"; dateColor = "6c272d";}
+        var bgcolor, dateColor, textColor;
+        if      (expredIn < EXPIRE_CRISIS) {bgcolor = "000000"; dateColor = "ef857d"; textColor = "ef857d";}
+        else if (expredIn < EXPIRE_DANGER) {bgcolor = "ee99ff"; dateColor = "47266e";}
+        else if (expredIn < EXPIRE_RISKY ) {bgcolor = "f19ca7"; dateColor = "6c272d";}
         else if (expredIn < EXPIRE_WARN  ) {bgcolor = "ffe9a9"; dateColor = "866629";}
         else if (expredIn < EXPIRE_INFO  ) {bgcolor = "a3e6e6"; dateColor = "006948";}
         const tr = document.createElement("tr")
         tr.setAttribute("style", "background-color: #" + bgcolor);
-        tr.innerHTML = getManabaTableRowHTML(dateColor, (expredIn < 5 * 24 * 3600000), expredTxt,
+        tr.innerHTML = getManabaTableRowHTML(dateColor, textColor, (expredIn < 5 * 24 * 3600000), expredTxt,
                                              asgmt.title, asgmt.title_link, asgmt.cource, asgmt.cource_link)
 
         tbody.appendChild(tr)
