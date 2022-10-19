@@ -28,6 +28,6 @@ const onClickEasyAttendanceButton = () => {
     window.open("https://ctat.ritsumei.ac.jp/attend/ctat?lang=ja&code=" + num);
 }
 
-// if (document.URL == "https://ct.ritsumei.ac.jp/ct/home" || document.URL == "https://ct.ritsumei.ac.jp/ct/home_course") {
+if (document.URL == "https://ct.ritsumei.ac.jp/ct/home" || document.URL == "https://ct.ritsumei.ac.jp/ct/home_course") {
     main();
-// }
+}

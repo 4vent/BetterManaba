@@ -150,7 +150,7 @@ async function main() {
         tr.innerHTML = getManabaTableRowHTML(dateColor, textColor, (expredIn < 5 * 24 * 3600000), expredTxt,
                                              asgmt.title, asgmt.title_link, asgmt.cource, asgmt.cource_link)
 
-        tbody.appendChild(tr)
+        tbody.appendChild(tr);
     })
 }
 
