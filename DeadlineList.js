@@ -156,7 +156,7 @@ function updateDeadline(tbody, marged_asgmts) {
         else if (expredIn < EXPIRE_INFO  ) {bgcolor = "a3e6e6"; dateColor = "006948";}
         const tr = document.createElement("tr")
         tr.setAttribute("style", "background-color: #" + bgcolor);
-        tr.innerHTML = getManabaTableRowHTML(dateColor, textColor, (expredIn < 5 * 24 * 3600000), expredTxt,
+        tr.innerHTML = getManabaTableRowHTML(dateColor, textColor, (expredIn < EXPIRE_INFO), expredTxt,
                                             asgmt.title, asgmt.title_link, asgmt.cource, asgmt.cource_link)
 
         tbody.appendChild(tr);
