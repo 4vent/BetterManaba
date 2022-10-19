@@ -44,8 +44,8 @@ function getManabaTableHTML(title) {
  */
 function getManabaTableRowHTML(dateColor, textColor, isBold, expredTxt, title, title_link, course, cource_link) {
     return `
-        <td style="width: 60px">
-            <div class="news-courseinfo" style="width: 120px; color: #${dateColor}; font-family: monospace;${(isBold) ? 'font-weight: bold;' : ''}">
+        <td style="width: 85px" valign="middle">
+            <div class="news-courseinfo" style="width: 85px; color: #${dateColor}; font-family: monospace;${(isBold) ? 'font-weight: bold;' : ''}">
                 ${expredTxt}
             </div>
         </td>
