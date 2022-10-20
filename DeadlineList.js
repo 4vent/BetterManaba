@@ -44,20 +44,24 @@ function getManabaTableHTML(title) {
  */
 function getManabaTableRowHTML(dateColor, textColor, isBold, expredTxt, title, title_link, course, cource_link) {
     return `
-        <td style="width: 85px" valign="middle">
-            <div class="news-courseinfo" style="width: 85px; color: #${dateColor}; font-family: monospace;${(isBold) ? 'font-weight: bold;' : ''}">
-                ${expredTxt}
+        <td style="width: 85px;">
+            <div style="color: #${dateColor}; font-family: monospace; ${(isBold) ? 'font-weight: bold;' : ''}">
+            ${expredTxt}
             </div>
         </td>
-        <td style="width: auto">
-            <div class="news-title newsentry" style="width: auto">
-                <img src="/icon-coursedeadline-on.png" class="inline" />
-                <a class="inline" style="width: auto;${(textColor == undefined)? '' : (' color: #' + textColor)}" href="${title_link}">${title}</a>
+        <td>
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <img src="/icon-coursedeadline-on.png">
+                <a ${(textColor == undefined)? '' : ('style="color: #' + textColor + '" ')}href="${title_link}">
+                    ${title}
+                </a>
             </div>
         </td>
-        <td style="width: 200px">
-            <div class="news-courseinfo" style="width: 200px">
-                <a href="${cource_link}"${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>${course}</a>
+        <td style="width: 200px;">
+            <div style="width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                <a href="${cource_link}"${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>
+                    ${course}
+                </a>
             </div>
         </td>
     `
