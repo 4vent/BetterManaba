@@ -10,24 +10,41 @@ const EXPIRE_RISKY  = 1.5 * _1DAY
 const EXPIRE_WARN   = 3.5 * _1DAY;
 const EXPIRE_INFO   = 7.5 * _1DAY;
 
+// function getManabaTableHTML(title) {
+//     return `
+//     <div class="my-infolist my-infolist-coursenews">
+//         <div class="my-infolist-header">
+//             <h2>${title}</h2>
+//         </div>
+//         <ul class="infolist-tab">
+//             <li class="current"><a href="" onclick="">すべて</a> </li> 
+//         </ul>
+//         <div class="align">
+//             <span></span>
+//         </div>
+//         <div class="my-infolist-body"><div class="groupthreadlist"><table><tbody>
+//         </tbody></table></div></div>
+//         <div class="showmore" hidden>
+//             <img src="/icon_mypage_showmore.png" alt="" class="inline" title="">
+//             <a href="home_coursenews_?nocategoryonly=&amp;categoryid=">あああ</a>
+//         </div>
+//     </div>
+//     `
+// }
+
 function getManabaTableHTML(title) {
     return `
-    <div class="my-infolist my-infolist-coursenews">
-        <div class="my-infolist-header">
-            <h2>${title}</h2>
-        </div>
-        <ul class="infolist-tab">
-            <li class="current"><a href="" onclick="">すべて</a> </li> 
-        </ul>
-        <div class="align">
-            <span></span>
-        </div>
-        <div class="my-infolist-body"><div class="groupthreadlist"><table><tbody>
-        </tbody></table></div></div>
-        <div class="showmore" hidden>
-            <img src="/icon_mypage_showmore.png" alt="" class="inline" title="">
-            <a href="home_coursenews_?nocategoryonly=&amp;categoryid=">あああ</a>
-        </div>
+    <div class="my-infolist my-infolist-mycourses" style="width: 670px">
+        <h3 class="course-type">${title}</h3>
+        <table class="stdlist courselist">
+            <tbody>
+                <tr class="title">
+                    <th style="width: 85px">残り時間</th>
+                    <th style="width: 400px">課題</th>
+                    <th style="width: 185px">コース</th>
+                </tr>
+            </tbody>
+        <table>
     </div>
     `
 }
@@ -42,28 +59,52 @@ function getManabaTableHTML(title) {
  * @param {String} cource_link 
  * @returns 
  */
+// function getManabaTableRowHTML(dateColor, textColor, isBold, expredTxt, title, title_link, course, cource_link) {
+//     return `
+//         <td style="width: 85px;">
+//             <div style="color: #${dateColor}; font-family: monospace; ${(isBold) ? 'font-weight: bold;' : ''}">
+//             ${expredTxt}
+//             </div>
+//         </td>
+//         <td>
+//             <div style="display: flex; align-items: center; gap: 5px;">
+//                 <img src="/icon-coursedeadline-on.png">
+//                 <a ${(textColor == undefined)? '' : ('style="color: #' + textColor + '" ')}href="${title_link}">
+//                     ${title}
+//                 </a>
+//             </div>
+//         </td>
+//         <td style="width: 200px;">
+//             <div style="width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+//                 <a href="${cource_link}"${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>
+//                     ${course}
+//                 </a>
+//             </div>
+//         </td>
+//     `
+// }
+
 function getManabaTableRowHTML(dateColor, textColor, isBold, expredTxt, title, title_link, course, cource_link) {
     return `
-        <td style="width: 85px;">
-            <div style="color: #${dateColor}; font-family: monospace; ${(isBold) ? 'font-weight: bold;' : ''}">
-            ${expredTxt}
-            </div>
-        </td>
-        <td>
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <img src="/icon-coursedeadline-on.png">
-                <a ${(textColor == undefined)? '' : ('style="color: #' + textColor + '" ')}href="${title_link}">
-                    ${title}
-                </a>
-            </div>
-        </td>
-        <td style="width: 200px;">
-            <div style="width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                <a href="${cource_link}"${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>
-                    ${course}
-                </a>
-            </div>
-        </td>
+    <tr class="row1 courselist-c" onclick="return manaba.clickChildAnchor(this,{'event':event,'href':'${title_link}'})">
+    <td class="center"><div style="width: 75px; color: #${dateColor}; font-family: monospace; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;${(isBold) ? 'font-weight: bold;' : ''}">
+        ${expredTxt}
+    </div></td>
+    <td class="center">
+        <div style="width: 390px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            <a href="${title_link}" title="${title}" ${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>
+                ${title}
+            </a>
+        </div>
+    </td>
+    <td>
+        <div style="width: 175px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            <a href="${cource_link}" title="${course}" ${(textColor == undefined)? '' : (' style="color: #' + textColor + '"')}>
+                ${course}
+            </a>
+        </div>
+    </td>
+</tr>
     `
 }
 
@@ -120,9 +161,10 @@ function genManabaTable(title) {
     const ref_elem = body.children[0];
     var div = document.createElement('div');
     body.insertBefore(div, ref_elem);
-    div.innerHTML = getManabaTableHTML(title)
+    div.innerHTML = getManabaTableHTML(title);
 
-    return div.children[0].children[3].children[0].children[0].children[0]
+    // return div.children[0].children[3].children[0].children[0].children[0]
+    return div.getElementsByTagName("tbody")[0];
 }
 
 /** @param {int} value @param {int} dig */
@@ -140,7 +182,9 @@ function sfill(value, dig) {
 
 /** @param {HTMLTableElement} tbody */
 function updateDeadline(tbody, marged_asgmts) {
-    Array.from(tbody.children).forEach(c => tbody.removeChild(c));
+    Array.from(tbody.children).forEach(c => {
+        if (c.className != "title") tbody.removeChild(c);
+    });
     Object.values(marged_asgmts).forEach(asgmt => {
         const due = asgmt.due
         const now = new Date().getTime()
