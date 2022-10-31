@@ -35,7 +35,9 @@ const EXPIRE_INFO   = 7.5 * _1DAY;
 function getManabaTableHTML(title) {
     return `
     <div class="my-infolist my-infolist-mycourses" style="width: 670px">
-        <h3 class="course-type">${title}</h3>
+        <div class="my-infolist-header">
+            <h2>${title}</h2>
+        </div>
         <table class="stdlist courselist">
             <tbody>
                 <tr class="title">
